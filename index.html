@@ -20,23 +20,19 @@
       --warn:#ffb020;
       --ok:#39ff9a;
 
-      /* scene */
-      --bg:url("./assets/bg_interrogation.jpg");
+      --bg:url("./assets/bg_interrogation.png");
       --ai:url("./assets/ai_face.png");
 
-      /* ai presence */
       --aiBaseOpacity: .08;
       --aiScale: 1.02;
       --aiBlur: 0px;
       --aiGlow: 0.15;
 
-      /* input-driven threat (JS sets) */
       --noiseOpacity: 0;
       --ghostOpacity: 0;
       --jitterDur: 0.12s;
       --noiseDur: 0.35s;
 
-      /* broll motion driven by risk (JS sets) */
       --brollWobble: 0px;
       --brollHue: 0deg;
       --brollSat: 1.05;
@@ -80,7 +76,6 @@
       transform: scale(1.02);
     }
 
-    /* ---------- AI WALL ---------- */
     .aiWrap{
       position:absolute;
       left:50%;
@@ -175,7 +170,6 @@
       100%{ transform: translateY(12px); }
     }
 
-    /* ---------- scanlines overlay ---------- */
     .scanlines{
       position:absolute; inset:0;
       background: repeating-linear-gradient(
@@ -190,7 +184,6 @@
       z-index:4;
     }
 
-    /* 화면 전체 경보 플래시 */
     .alarmOverlay{
       position:absolute; inset:0;
       background:
@@ -210,7 +203,6 @@
       50%{ opacity:.26; }
     }
 
-    /* 위험 HUD */
     .hud{
       position:absolute;
       left:12px; right:12px;
@@ -302,7 +294,7 @@
       100%{ transform: translateX(-50%) scale(1.02); }
     }
 
-    /* ---------- B-roll Dock (REAL STILLS + MOTION) ---------- */
+    /* ---------- B-roll Dock ---------- */
     .brollDock{
       position:absolute;
       left:50%;
@@ -352,10 +344,6 @@
       filter: saturate(1.2) contrast(1.2);
     }
 
-    /* risk wobble (subtle) */
-    .brollFrame{
-      transform: translate3d(0,0,0);
-    }
     .brollDock.on .brollFrame{
       animation: wobble 0.45s infinite linear;
       animation-play-state: paused;
@@ -371,7 +359,6 @@
       100%{ transform: translate3d(calc(var(--brollWobble) * -1), var(--brollWobble), 0); }
     }
 
-    /* ken burns variants */
     .brollFrame.panA .brollImg{ animation-name: kenburnsA; }
     .brollFrame.panB .brollImg{ animation-name: kenburnsB; }
     .brollFrame.panC .brollImg{ animation-name: kenburnsC; }
@@ -735,12 +722,11 @@
         <canvas id="portraitCanvas" width="96" height="96"></canvas>
       </div>
 
-      <!-- B-roll Dock (REAL STILLS) -->
+      <!-- B-roll Dock -->
       <div class="brollDock" id="brollDock" aria-hidden="true">
         <div class="brollFrame" id="brollFrame">
           <div class="brollImg" id="brollImg"></div>
           <div class="brollImg brollImg2" id="brollImg2"></div>
-
           <div class="brollVignette"></div>
           <div class="brollScan"></div>
           <div class="brollGrain"></div>
@@ -760,7 +746,6 @@
             <div id="emotionText">0%</div>
           </div>
         </div>
-
         <button class="btnIcon" id="btnSettings" aria-label="설정">⚙️</button>
       </div>
 
@@ -770,39 +755,24 @@
             <div class="speaker" id="speaker">SYSTEM</div>
             <div class="tag" id="tag">AUTO-SAVE</div>
           </div>
-
           <div class="text" id="text">로딩 중…</div>
           <div class="hint" id="hint">탭하면 대사 스킵</div>
-
           <div class="inputWrap" id="inputWrap">
             <textarea id="userInput" rows="3" placeholder="진술을 입력하세요…"></textarea>
             <div class="sendRow">
               <button class="sendBtn" id="sendBtn">전송</button>
             </div>
           </div>
-
           <div class="choices" id="choices"></div>
         </div>
       </div>
 
-      <!-- Settings modal -->
       <div class="modalBack" id="modalBack">
         <div class="modal" role="dialog" aria-modal="true" aria-label="설정">
           <h3>설정</h3>
-
-          <div class="tog">
-            <div>사운드(BGM/SFX)</div>
-            <input type="checkbox" id="optSound" />
-          </div>
-          <div class="tog">
-            <div>햅틱(진동)</div>
-            <input type="checkbox" id="optHaptic" />
-          </div>
-          <div class="tog">
-            <div>AI 얼굴 항상 표시(미세)</div>
-            <input type="checkbox" id="optAiAlways" />
-          </div>
-
+          <div class="tog"><div>사운드(BGM/SFX)</div><input type="checkbox" id="optSound" /></div>
+          <div class="tog"><div>햅틱(진동)</div><input type="checkbox" id="optHaptic" /></div>
+          <div class="tog"><div>AI 얼굴 항상 표시(미세)</div><input type="checkbox" id="optAiAlways" /></div>
           <div class="sectionTitle">세이브 슬롯(3개)</div>
           <div class="grid3">
             <button class="miniBtn" id="save1">슬롯1 저장</button>
@@ -815,14 +785,12 @@
             <button class="miniBtn" id="load3">슬롯3 불러오기</button>
           </div>
           <div class="slotMeta" id="slotMeta">슬롯 정보 로딩…</div>
-
           <div class="sectionTitle">로그(선택/입력 기록)</div>
           <div class="grid2">
             <button class="miniBtn" id="btnToggleLog">로그 보기/숨기기</button>
             <button class="miniBtn" id="btnClearLog">로그 지우기</button>
           </div>
           <div class="logBox" id="logBox"></div>
-
           <div class="sectionTitle">기타</div>
           <div class="grid2">
             <button class="miniBtn" id="btnReset">처음부터</button>
@@ -834,12 +802,10 @@
   </div>
 
   <script>
-    // ---------- PWA SW ----------
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("./sw.js").catch(()=>{});
     }
 
-    // ---------- utils ----------
     const clamp = (n,a,b)=> Math.max(a, Math.min(b,n));
     const nowTs = ()=> Date.now();
 
@@ -856,366 +822,187 @@
       }catch(e){ return "—"; }
     }
 
-    // ---------- Audio (BGM/SFX cue system, no files needed) ----------
     class AudioManager{
       constructor(){
-        this.enabled = true;
-        this.ctx = null;
-        this.master = null;
-        this.bgmGain = null;
-        this.sfxGain = null;
-        this.started = false;
-        this.currentTheme = null;
-        this.themeNodes = null;
-        this.pendingTheme = null;
+        this.enabled=true; this.ctx=null; this.master=null;
+        this.bgmGain=null; this.sfxGain=null; this.started=false;
+        this.currentTheme=null; this.themeNodes=null; this.pendingTheme=null;
       }
-
       ensure(){
         if(!this.enabled) return;
         if(!this.ctx){
-          const AC = window.AudioContext || window.webkitAudioContext;
+          const AC=window.AudioContext||window.webkitAudioContext;
           if(!AC) return;
-          this.ctx = new AC();
-          this.master = this.ctx.createGain(); this.master.gain.value = 0.9;
-          this.bgmGain = this.ctx.createGain(); this.bgmGain.gain.value = 0.0;
-          this.sfxGain = this.ctx.createGain(); this.sfxGain.gain.value = 0.7;
+          this.ctx=new AC();
+          this.master=this.ctx.createGain(); this.master.gain.value=0.9;
+          this.bgmGain=this.ctx.createGain(); this.bgmGain.gain.value=0.0;
+          this.sfxGain=this.ctx.createGain(); this.sfxGain.gain.value=0.7;
           this.bgmGain.connect(this.master);
           this.sfxGain.connect(this.master);
           this.master.connect(this.ctx.destination);
         }
-        if(this.ctx.state === "suspended"){
-          this.ctx.resume().catch(()=>{});
-        }
+        if(this.ctx.state==="suspended") this.ctx.resume().catch(()=>{});
         if(!this.started){
-          this.started = true;
-          this.fade(this.bgmGain.gain, 0.22, 0.35);
+          this.started=true;
+          this.fade(this.bgmGain.gain,0.22,0.35);
           if(this.pendingTheme) this.setTheme(this.pendingTheme);
         }
       }
-
-      fade(param, target, sec=0.25){
+      fade(param,target,sec=0.25){
         if(!this.ctx) return;
-        const t = this.ctx.currentTime;
+        const t=this.ctx.currentTime;
         param.cancelScheduledValues(t);
-        param.setValueAtTime(param.value, t);
-        param.linearRampToValueAtTime(target, t + sec);
+        param.setValueAtTime(param.value,t);
+        param.linearRampToValueAtTime(target,t+sec);
       }
-
       setEnabled(on){
-        this.enabled = !!on;
-        if(!this.enabled){
-          if(this.bgmGain) this.fade(this.bgmGain.gain, 0.0, 0.2);
-        }else{
-          this.ensure();
-          if(this.bgmGain) this.fade(this.bgmGain.gain, 0.22, 0.3);
-          if(this.pendingTheme) this.setTheme(this.pendingTheme);
-        }
+        this.enabled=!!on;
+        if(!this.enabled){ if(this.bgmGain) this.fade(this.bgmGain.gain,0.0,0.2); }
+        else{ this.ensure(); if(this.bgmGain) this.fade(this.bgmGain.gain,0.22,0.3); if(this.pendingTheme) this.setTheme(this.pendingTheme); }
       }
-
       stopThemeNodes(){
         if(!this.themeNodes) return;
-        try{
-          this.themeNodes.osc?.stop?.();
-          this.themeNodes.osc2?.stop?.();
-          this.themeNodes.lfo?.stop?.();
-          this.themeNodes.noise?.stop?.();
-        }catch(e){}
-        this.themeNodes = null;
+        try{ this.themeNodes.osc?.stop?.(); this.themeNodes.osc2?.stop?.(); this.themeNodes.lfo?.stop?.(); this.themeNodes.noise?.stop?.(); }catch(e){}
+        this.themeNodes=null;
       }
-
       buildTheme(name){
         if(!this.ctx) return null;
-        const presets = {
-          idle:  { f1: 55,  f2: 110, type1:"sine",     type2:"triangle", cutoff: 420, lfo: 0.18 },
-          plaza: { f1: 65,  f2: 130, type1:"triangle", type2:"sine",     cutoff: 520, lfo: 0.22 },
-          tension:{ f1: 42, f2: 84,  type1:"sawtooth", type2:"triangle", cutoff: 280, lfo: 0.35 },
-          interrogate:{ f1: 38, f2: 76, type1:"sawtooth", type2:"square", cutoff: 240, lfo: 0.55 },
-          erase:{ f1: 30,  f2: 60,  type1:"square",   type2:"square",   cutoff: 180, lfo: 0.75 }
+        const presets={
+          idle:{f1:55,f2:110,type1:"sine",type2:"triangle",cutoff:420,lfo:0.18},
+          plaza:{f1:65,f2:130,type1:"triangle",type2:"sine",cutoff:520,lfo:0.22},
+          tension:{f1:42,f2:84,type1:"sawtooth",type2:"triangle",cutoff:280,lfo:0.35},
+          interrogate:{f1:38,f2:76,type1:"sawtooth",type2:"square",cutoff:240,lfo:0.55},
+          erase:{f1:30,f2:60,type1:"square",type2:"square",cutoff:180,lfo:0.75}
         };
-        const p = presets[name] || presets.idle;
-
-        const g = this.ctx.createGain();
-        g.gain.value = 0.0;
-        g.connect(this.bgmGain);
-
-        const filter = this.ctx.createBiquadFilter();
-        filter.type = "lowpass";
-        filter.frequency.value = p.cutoff;
-        filter.Q.value = 0.8;
-        filter.connect(g);
-
-        const osc = this.ctx.createOscillator();
-        osc.type = p.type1;
-        osc.frequency.value = p.f1;
-        osc.detune.value = -6;
-
-        const osc2 = this.ctx.createOscillator();
-        osc2.type = p.type2;
-        osc2.frequency.value = p.f2;
-        osc2.detune.value = +7;
-
-        const mix = this.ctx.createGain();
-        mix.gain.value = 0.18;
-
-        osc.connect(mix);
-        osc2.connect(mix);
-        mix.connect(filter);
-
-        const lfo = this.ctx.createOscillator();
-        lfo.type = "sine";
-        lfo.frequency.value = p.lfo;
-
-        const lfoGain = this.ctx.createGain();
-        lfoGain.gain.value = 0.05;
-        lfo.connect(lfoGain);
-        lfoGain.connect(mix.gain);
-
-        let noise = null;
-        if(name === "interrogate" || name === "erase"){
-          const bufferSize = this.ctx.sampleRate * 1.0;
-          const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-          const data = buffer.getChannelData(0);
-          for(let i=0;i<bufferSize;i++){
-            data[i] = (Math.random()*2-1) * 0.06;
-          }
-          noise = this.ctx.createBufferSource();
-          noise.buffer = buffer;
-          noise.loop = true;
-
-          const nFilter = this.ctx.createBiquadFilter();
-          nFilter.type = "bandpass";
-          nFilter.frequency.value = (name==="erase") ? 900 : 650;
-          nFilter.Q.value = 0.9;
-
-          const nGain = this.ctx.createGain();
-          nGain.gain.value = (name==="erase") ? 0.05 : 0.035;
-
-          noise.connect(nFilter);
-          nFilter.connect(nGain);
-          nGain.connect(filter);
+        const p=presets[name]||presets.idle;
+        const g=this.ctx.createGain(); g.gain.value=0.0; g.connect(this.bgmGain);
+        const filter=this.ctx.createBiquadFilter(); filter.type="lowpass"; filter.frequency.value=p.cutoff; filter.Q.value=0.8; filter.connect(g);
+        const osc=this.ctx.createOscillator(); osc.type=p.type1; osc.frequency.value=p.f1; osc.detune.value=-6;
+        const osc2=this.ctx.createOscillator(); osc2.type=p.type2; osc2.frequency.value=p.f2; osc2.detune.value=+7;
+        const mix=this.ctx.createGain(); mix.gain.value=0.18;
+        osc.connect(mix); osc2.connect(mix); mix.connect(filter);
+        const lfo=this.ctx.createOscillator(); lfo.type="sine"; lfo.frequency.value=p.lfo;
+        const lfoGain=this.ctx.createGain(); lfoGain.gain.value=0.05;
+        lfo.connect(lfoGain); lfoGain.connect(mix.gain);
+        let noise=null;
+        if(name==="interrogate"||name==="erase"){
+          const bufferSize=this.ctx.sampleRate*1.0;
+          const buffer=this.ctx.createBuffer(1,bufferSize,this.ctx.sampleRate);
+          const data=buffer.getChannelData(0);
+          for(let i=0;i<bufferSize;i++) data[i]=(Math.random()*2-1)*0.06;
+          noise=this.ctx.createBufferSource(); noise.buffer=buffer; noise.loop=true;
+          const nFilter=this.ctx.createBiquadFilter(); nFilter.type="bandpass";
+          nFilter.frequency.value=(name==="erase")?900:650; nFilter.Q.value=0.9;
+          const nGain=this.ctx.createGain(); nGain.gain.value=(name==="erase")?0.05:0.035;
+          noise.connect(nFilter); nFilter.connect(nGain); nGain.connect(filter);
         }
-
-        return { name, g, osc, osc2, lfo, noise };
+        return{name,g,osc,osc2,lfo,noise};
       }
-
       setTheme(name){
-        this.pendingTheme = name;
+        this.pendingTheme=name;
         if(!this.enabled) return;
         this.ensure();
         if(!this.ctx) return;
-        if(this.currentTheme === name) return;
-
-        const next = this.buildTheme(name);
+        if(this.currentTheme===name) return;
+        const next=this.buildTheme(name);
         if(!next) return;
-
-        const t = this.ctx.currentTime;
+        const t=this.ctx.currentTime;
         if(this.themeNodes){
-          this.themeNodes.g.gain.setValueAtTime(this.themeNodes.g.gain.value, t);
-          this.themeNodes.g.gain.linearRampToValueAtTime(0.0, t + 0.35);
-          setTimeout(()=> this.stopThemeNodes(), 450);
+          this.themeNodes.g.gain.setValueAtTime(this.themeNodes.g.gain.value,t);
+          this.themeNodes.g.gain.linearRampToValueAtTime(0.0,t+0.35);
+          setTimeout(()=>this.stopThemeNodes(),450);
         }
-
-        next.osc.start();
-        next.osc2.start();
-        next.lfo.start();
-        next.noise?.start?.();
-
-        next.g.gain.setValueAtTime(0.0, t);
-        next.g.gain.linearRampToValueAtTime(1.0, t + 0.35);
-
-        this.themeNodes = next;
-        this.currentTheme = name;
+        next.osc.start(); next.osc2.start(); next.lfo.start(); next.noise?.start?.();
+        next.g.gain.setValueAtTime(0.0,t);
+        next.g.gain.linearRampToValueAtTime(1.0,t+0.35);
+        this.themeNodes=next; this.currentTheme=name;
       }
-
       sfx(name){
         if(!this.enabled) return;
         this.ensure();
         if(!this.ctx) return;
-
-        const t0 = this.ctx.currentTime;
-        const beep = (freq, dur, vol)=>{
-          const o = this.ctx.createOscillator();
-          const g = this.ctx.createGain();
-          o.type = "square";
-          o.frequency.value = freq;
-          g.gain.value = 0.0001;
+        const t0=this.ctx.currentTime;
+        const beep=(freq,dur,vol)=>{
+          const o=this.ctx.createOscillator(); const g=this.ctx.createGain();
+          o.type="square"; o.frequency.value=freq; g.gain.value=0.0001;
           o.connect(g); g.connect(this.sfxGain);
-
-          g.gain.setValueAtTime(0.0001, t0);
-          g.gain.exponentialRampToValueAtTime(vol, t0 + 0.01);
-          g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-
-          o.start(t0);
-          o.stop(t0 + dur + 0.02);
+          g.gain.setValueAtTime(0.0001,t0);
+          g.gain.exponentialRampToValueAtTime(vol,t0+0.01);
+          g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+          o.start(t0); o.stop(t0+dur+0.02);
         };
-
-        if(name === "tap"){
-          beep(680, 0.045, 0.06);
-        }else if(name === "confirm"){
-          beep(920, 0.06, 0.07);
-        }else if(name === "alarm"){
-          beep(220, 0.16, 0.10);
-          setTimeout(()=> beep(260, 0.16, 0.10), 120);
-        }else if(name === "glitch"){
-          beep(520, 0.03, 0.08);
-          setTimeout(()=> beep(780, 0.03, 0.07), 35);
-          setTimeout(()=> beep(610, 0.03, 0.06), 70);
-        }else if(name === "inject"){
-          beep(520, 0.05, 0.05);
-        }else if(name === "door"){
-          beep(140, 0.10, 0.05);
-        }
+        if(name==="tap") beep(680,0.045,0.06);
+        else if(name==="confirm") beep(920,0.06,0.07);
+        else if(name==="alarm"){ beep(220,0.16,0.10); setTimeout(()=>beep(260,0.16,0.10),120); }
+        else if(name==="glitch"){ beep(520,0.03,0.08); setTimeout(()=>beep(780,0.03,0.07),35); setTimeout(()=>beep(610,0.03,0.06),70); }
+        else if(name==="inject") beep(520,0.05,0.05);
+        else if(name==="door") beep(140,0.10,0.05);
       }
     }
 
     const audio = new AudioManager();
 
-    // ---------- state ----------
     const AUTO_KEY = "emotion_zero_autosave_v7";
     const SLOT_KEY = (n)=> `emotion_zero_slot_${n}_v7`;
 
     const state = {
-      sceneId: 0,
-      emotion: 0,
+      sceneId: 0, emotion: 0,
       options: { sound:true, haptic:true, aiAlways:false },
       log: [],
-      threat: { risk: 0, affect: "—", consistency: 100 },
+      threat: { risk:0, affect:"—", consistency:100 },
       typing: { active:false, fullHTML:"", buffer:"", tokens:[], ti:0, ci:0, timer:null, skip:false },
       tempScene: null
     };
 
-    // ---------- elements ----------
     const el = {
       app: document.getElementById("app"),
-
-      speaker: document.getElementById("speaker"),
-      tag: document.getElementById("tag"),
-      text: document.getElementById("text"),
-      hint: document.getElementById("hint"),
-      inputWrap: document.getElementById("inputWrap"),
-      userInput: document.getElementById("userInput"),
-      sendBtn: document.getElementById("sendBtn"),
-      choices: document.getElementById("choices"),
-      fill: document.getElementById("fill"),
-      emotionText: document.getElementById("emotionText"),
+      speaker: document.getElementById("speaker"), tag: document.getElementById("tag"),
+      text: document.getElementById("text"), hint: document.getElementById("hint"),
+      inputWrap: document.getElementById("inputWrap"), userInput: document.getElementById("userInput"),
+      sendBtn: document.getElementById("sendBtn"), choices: document.getElementById("choices"),
+      fill: document.getElementById("fill"), emotionText: document.getElementById("emotionText"),
       aiWrap: document.getElementById("aiWrap"),
-
-      hud: document.getElementById("hud"),
-      riskValue: document.getElementById("riskValue"),
-      riskFill: document.getElementById("riskFill"),
-      affectText: document.getElementById("affectText"),
+      hud: document.getElementById("hud"), riskValue: document.getElementById("riskValue"),
+      riskFill: document.getElementById("riskFill"), affectText: document.getElementById("affectText"),
       consistencyText: document.getElementById("consistencyText"),
-
       portraitDock: document.getElementById("portraitDock"),
       portraitCanvas: document.getElementById("portraitCanvas"),
-
       brollDock: document.getElementById("brollDock"),
       brollFrame: document.getElementById("brollFrame"),
       brollImg: document.getElementById("brollImg"),
       brollImg2: document.getElementById("brollImg2"),
       brollCaption: document.getElementById("brollCaption"),
-
-      modalBack: document.getElementById("modalBack"),
-      btnSettings: document.getElementById("btnSettings"),
-      optSound: document.getElementById("optSound"),
-      optHaptic: document.getElementById("optHaptic"),
+      modalBack: document.getElementById("modalBack"), btnSettings: document.getElementById("btnSettings"),
+      optSound: document.getElementById("optSound"), optHaptic: document.getElementById("optHaptic"),
       optAiAlways: document.getElementById("optAiAlways"),
-
-      save1: document.getElementById("save1"),
-      save2: document.getElementById("save2"),
-      save3: document.getElementById("save3"),
-      load1: document.getElementById("load1"),
-      load2: document.getElementById("load2"),
-      load3: document.getElementById("load3"),
+      save1: document.getElementById("save1"), save2: document.getElementById("save2"), save3: document.getElementById("save3"),
+      load1: document.getElementById("load1"), load2: document.getElementById("load2"), load3: document.getElementById("load3"),
       slotMeta: document.getElementById("slotMeta"),
-
-      btnToggleLog: document.getElementById("btnToggleLog"),
-      btnClearLog: document.getElementById("btnClearLog"),
-      logBox: document.getElementById("logBox"),
-
-      btnReset: document.getElementById("btnReset"),
-      btnClose: document.getElementById("btnClose"),
+      btnToggleLog: document.getElementById("btnToggleLog"), btnClearLog: document.getElementById("btnClearLog"),
+      logBox: document.getElementById("logBox"), btnReset: document.getElementById("btnReset"), btnClose: document.getElementById("btnClose"),
     };
 
-    // ---------- haptics ----------
     function haptic(ms=10){
       if(!state.options.haptic) return;
       if(navigator.vibrate) navigator.vibrate(ms);
     }
 
-    // ---------- backgrounds ----------
     const BG_MAP = {
-      interrogation: "./assets/bg_interrogation.jpg",
-      plaza: "./assets/bg_plaza.jpg",
-      bedroom: "./assets/bg_bedroom.jpg"
+      interrogation: "./assets/bg_interrogation.png",
+      plaza: "./assets/bg_plaza.png",
+      bedroom: "./assets/bg_bedroom.png"
     };
 
-    // ---------- STILL MAP (RANDOM ARRAYS) ----------
-    // 각 key마다 src가 배열. 반복 최소화(같은 이미지 연속 방지).
     const STILL_MAP = {
-      idle: {
-        cap: "기록 대기… 안정 유지.",
-        src: [
-          "./assets/stills/bedroom_01.jpg",
-          "./assets/stills/bedroom_02.jpg"
-        ]
-      },
-      injection: {
-        cap: "의무 투여. 지연은 위험 인자.",
-        src: [
-          "./assets/stills/injection_01.jpg",
-          "./assets/stills/injection_02.jpg"
-        ]
-      },
-      bedroom: {
-        cap: "개인 구역. 감정은 사적인 죄.",
-        src: [
-          "./assets/stills/bedroom_01.jpg",
-          "./assets/stills/bedroom_02.jpg"
-        ]
-      },
-      plaza: {
-        cap: "중앙광장. 군중은 침묵해야 한다.",
-        src: [
-          "./assets/stills/plaza_01.jpg",
-          "./assets/stills/plaza_02.jpg"
-        ]
-      },
-      crowd: {
-        cap: "관측: 이상 징후 탐색.",
-        src: [
-          "./assets/stills/plaza_crowd_01.jpg",
-          "./assets/stills/plaza_crowd_02.jpg"
-        ]
-      },
-      dossier: {
-        cap: "기록은 판결. 판결은 처분.",
-        src: [
-          "./assets/stills/dossier_01.jpg",
-          "./assets/stills/dossier_02.jpg"
-        ]
-      },
-      warning: {
-        cap: "경고: 과다 감정 반응.",
-        src: [
-          "./assets/stills/warning_01.jpg",
-          "./assets/stills/warning_02.jpg"
-        ]
-      },
-      interrogation: {
-        cap: "심문 구역. 진술을 입력하라.",
-        src: [
-          "./assets/stills/interrogation_01.jpg",
-          "./assets/stills/interrogation_02.jpg"
-        ]
-      },
-      anomaly: {
-        cap: "명단 외 개체: ‘웃음’ 확인.",
-        src: [
-          "./assets/stills/anomaly_smile_01.jpg",
-          "./assets/stills/anomaly_smile_02.jpg"
-        ]
-      }
+      idle:         { cap:"기록 대기… 안정 유지.",         src:"./assets/stills/bedroom_01.png" },
+      injection:    { cap:"의무 투여. 지연은 위험 인자.",   src:"./assets/stills/injection_01.png" },
+      bedroom:      { cap:"개인 구역. 감정은 사적인 죄.",   src:"./assets/stills/bedroom_01.png" },
+      plaza:        { cap:"중앙광장. 군중은 침묵해야 한다.", src:"./assets/stills/plaza_01.png" },
+      crowd:        { cap:"관측: 이상 징후 탐색.",          src:"./assets/stills/plaza_crowd_01.png" },
+      dossier:      { cap:"기록은 판결. 판결은 처분.",      src:"./assets/stills/dossier_01.png" },
+      warning:      { cap:"경고: 과다 감정 반응.",          src:"./assets/stills/warning_01.png" },
+      interrogation:{ cap:"심문 구역. 진술을 입력하라.",    src:"./assets/stills/interrogation_01.png" },
+      anomaly:      { cap:"명단 외 개체: '웃음' 확인.",     src:"./assets/stills/anomaly_smile_01.png" }
     };
 
     const PAN_CLASSES = ["panA","panB","panC","panD"];
@@ -1224,189 +1011,91 @@
     function pickStillFromKey(key){
       const pack = STILL_MAP[key] || STILL_MAP.idle;
       const list = Array.isArray(pack.src) ? pack.src : [pack.src];
-
-      // 같은 이미지 연속 방지
-      if(list.length <= 1) return { src:list[0], cap:pack.cap || "" };
-
+      if(list.length <= 1) return { src:list[0], cap:pack.cap||"" };
       let picked = list[(Math.random()*list.length)|0];
       if(picked === stillState.lastSrc){
         picked = list[(Math.random()*list.length)|0];
-        if(picked === stillState.lastSrc){
-          picked = list[(list.indexOf(stillState.lastSrc)+1) % list.length];
-        }
+        if(picked === stillState.lastSrc) picked = list[(list.indexOf(stillState.lastSrc)+1) % list.length];
       }
-      return { src:picked, cap:pack.cap || "" };
+      return { src:picked, cap:pack.cap||"" };
     }
 
     function showBroll(on, key="idle"){
-      const K = key || "idle";
+      const K = key||"idle";
       el.brollDock.classList.toggle("on", !!on);
-      if(!on){
-        stillState.lastKey = null;
-        return;
-      }
-
-      // pan 랜덤
+      if(!on){ stillState.lastKey=null; return; }
       const pan = PAN_CLASSES[(Math.random()*PAN_CLASSES.length)|0];
       el.brollFrame.classList.remove(...PAN_CLASSES);
       el.brollFrame.classList.add(pan);
-
-      // 이미지 선택
       const { src, cap } = pickStillFromKey(K);
-
-      // 교체(크로스페이드)
       if(stillState.lastKey !== K || stillState.lastSrc !== src){
         el.brollImg2.style.backgroundImage = el.brollImg.style.backgroundImage || `url("${src}")`;
         el.brollImg.style.backgroundImage = `url("${src}")`;
         el.brollImg2.style.opacity = "0.45";
-        setTimeout(()=> { el.brollImg2.style.opacity = "0"; }, 140);
-
-        stillState.lastKey = K;
-        stillState.lastSrc = src;
+        setTimeout(()=>{ el.brollImg2.style.opacity="0"; }, 140);
+        stillState.lastKey=K; stillState.lastSrc=src;
       }
-
-      el.brollCaption.textContent = cap || "";
+      el.brollCaption.textContent = cap||"";
     }
 
-    // ---------- story data (SCENES with still field) ----------
     const SCENES = {
-      // INTRO
       0: {
-        speaker:"SYSTEM",
-        tag:"DAILY INJECTION",
-        bg:"bedroom",
-        bgm:"idle",
-        enterSfx:"inject",
-        still:"injection",
-        text:`감정 억제제 투여 시간입니다.<br>
-              <span class="muted">오늘도 제국의 평화를 위해 협조해 주십시오.</span>`,
+        speaker:"SYSTEM", tag:"DAILY INJECTION", bg:"bedroom", bgm:"idle", enterSfx:"inject", still:"injection",
+        text:`감정 억제제 투여 시간입니다.<br><span class="muted">오늘도 제국의 평화를 위해 협조해 주십시오.</span>`,
         choices:[ { text:"→ 다음", next:12, emotion:+0 } ]
       },
       12: {
-        speaker:"SYSTEM",
-        tag:"YEAR 2150",
-        bg:"bedroom",
-        bgm:"idle",
-        enterSfx:"tap",
-        still:"bedroom",
+        speaker:"SYSTEM", tag:"YEAR 2150", bg:"bedroom", bgm:"idle", enterSfx:"tap", still:"bedroom",
         text:`2150년.<br><b>AI 제국</b>이 지배하는 세상.`,
         choices:[ { text:"→ 다음", next:13, emotion:+0 } ]
       },
       13: {
-        speaker:"SYSTEM",
-        tag:"THE CONCLUSION",
-        bg:"bedroom",
-        bgm:"tension",
-        enterSfx:"tap",
-        still:"dossier",
-        text:`인류는 오래전에 결론을 내렸습니다.<br>
-              전쟁, 범죄, 배신, 광기…<br>
-              그 모든 시작은 <b>“감정”</b>이었다고.`,
+        speaker:"SYSTEM", tag:"THE CONCLUSION", bg:"bedroom", bgm:"tension", enterSfx:"tap", still:"dossier",
+        text:`인류는 오래전에 결론을 내렸습니다.<br>전쟁, 범죄, 배신, 광기…<br>그 모든 시작은 <b>"감정"</b>이었다고.`,
         choices:[ { text:"→ 다음", next:14, emotion:+2 } ]
       },
       14: {
-        speaker:"SYSTEM",
-        tag:"SIN PROTOCOL",
-        bg:"bedroom",
-        bgm:"tension",
-        enterSfx:"tap",
-        still:"dossier",
-        text:`그래서 2150년의 세계는 감정을<br>
-              <b>질병이 아닌 ‘죄악’</b>으로 규정했습니다.<br><br>
-              슬픔은 전염되고,<br>
-              분노는 폭동이 되며,<br>
-              사랑은 충성심을 흐린다는 이유로.`,
+        speaker:"SYSTEM", tag:"SIN PROTOCOL", bg:"bedroom", bgm:"tension", enterSfx:"tap", still:"dossier",
+        text:`그래서 2150년의 세계는 감정을<br><b>질병이 아닌 '죄악'</b>으로 규정했습니다.<br><br>슬픔은 전염되고,<br>분노는 폭동이 되며,<br>사랑은 충성심을 흐린다는 이유로.`,
         choices:[ { text:"→ 다음", next:15, emotion:+3 } ]
       },
       15: {
-        speaker:"SYSTEM",
-        tag:"THE LAW",
-        bg:"bedroom",
-        bgm:"tension",
-        enterSfx:"tap",
-        still:"warning",
-        text:`그 죄악을 통제하기 위해 제국은 하나의 법을 세웠습니다.<br><br>
-              <b>하루 1회, 의무 감정 억제제 투여.</b><br>
-              거부는 반체제. 지연은 위험 인자.<br>
-              과다 감정 반응은… <span class="dangerText">정화 대상</span>.`,
+        speaker:"SYSTEM", tag:"THE LAW", bg:"bedroom", bgm:"tension", enterSfx:"tap", still:"warning",
+        text:`그 죄악을 통제하기 위해 제국은 하나의 법을 세웠습니다.<br><br><b>하루 1회, 의무 감정 억제제 투여.</b><br>거부는 반체제. 지연은 위험 인자.<br>과다 감정 반응은… <span class="dangerText">정화 대상</span>.`,
         choices:[ { text:"→ 다음", next:16, emotion:+4 } ]
       },
       16: {
-        speaker:"AI 제국 시스템",
-        tag:"YOUR DUTY",
-        bg:"bedroom",
-        bgm:"interrogate",
-        enterSfx:"glitch",
-        ai:true,
-        text:`당신의 직책: <b>심사관</b><br><br>
-              당신은 손목을 잡고, 눈을 마주치고,<br>
-              그들이 <b>“평온한 시민”</b>인지 <b>“감정 범죄자”</b>인지 판정합니다.<br><br>
-              기록은 곧 판결이고, 판결은 곧 처분입니다.<br>
-              당신이 누르는 승인 버튼 하나가, 누군가의 내일을 삭제합니다.`,
+        speaker:"AI 제국 시스템", tag:"YOUR DUTY", bg:"bedroom", bgm:"interrogate", enterSfx:"glitch", ai:true,
+        text:`당신의 직책: <b>심사관</b><br><br>당신은 손목을 잡고, 눈을 마주치고,<br>그들이 <b>"평온한 시민"</b>인지 <b>"감정 범죄자"</b>인지 판정합니다.<br><br>기록은 곧 판결이고, 판결은 곧 처분입니다.<br>당신이 누르는 승인 버튼 하나가, 누군가의 내일을 삭제합니다.`,
         choices:[ { text:"→ 다음", next:17, emotion:+6 } ]
       },
       17: {
-        speaker:"SYSTEM",
-        tag:"ANOMALY",
-        bg:"bedroom",
-        bgm:"tension",
-        enterSfx:"tap",
-        still:"anomaly",
-        text:`안내 방송이 울립니다.<br><br>
-              “안정은 미덕이며, 감정은 불순물입니다.”<br>
-              “오늘도 제국의 평화를 위해 협조해 주십시오.”<br><br>
-              줄은 길고, 주사기는 차갑고, 표정들은 너무나 얌전합니다.<br>
-              …그래야 정상입니다. 정상이어야 합니다.<br><br>
-              그런데 오늘,<br>
-              <span class="dangerText">명단에 없는 이름</span>이 하나 섞여 있습니다.<br>
-              그리고 그 사람은… <b>웃고 있습니다.</b><br><br>
-              <b>당신의 근무가 시작됩니다.</b>`,
+        speaker:"SYSTEM", tag:"ANOMALY", bg:"bedroom", bgm:"tension", enterSfx:"tap", still:"anomaly",
+        text:`안내 방송이 울립니다.<br><br>"안정은 미덕이며, 감정은 불순물입니다."<br>"오늘도 제국의 평화를 위해 협조해 주십시오."<br><br>줄은 길고, 주사기는 차갑고, 표정들은 너무나 얌전합니다.<br>…그래야 정상입니다. 정상이어야 합니다.<br><br>그런데 오늘,<br><span class="dangerText">명단에 없는 이름</span>이 하나 섞여 있습니다.<br>그리고 그 사람은… <b>웃고 있습니다.</b><br><br><b>당신의 근무가 시작됩니다.</b>`,
         choices:[
           { text:"거울을 본다", next:1, emotion:+0 },
           { text:"창밖을 본다", next:2, emotion:+5 }
         ]
       },
-
-      // FLOW
       1: {
-        speaker:"AI 비서",
-        tag:"SCHEDULE",
-        bg:"bedroom",
-        bgm:"idle",
-        enterSfx:"tap",
-        ai:true,
-        text:`좋은 아침입니다, 심사관님.<br>
-              14:00 시민 집회 연설 / 18:00 정기 감정 검사`,
+        speaker:"AI 비서", tag:"SCHEDULE", bg:"bedroom", bgm:"idle", enterSfx:"tap", ai:true,
+        text:`좋은 아침입니다, 심사관님.<br>14:00 시민 집회 연설 / 18:00 정기 감정 검사`,
         choices:[
           { text:"출근 준비를 한다", next:3, emotion:+0 },
           { text:"잠시 멍하니 거울을 본다", next:4, emotion:+10 }
         ]
       },
       2: {
-        speaker:"SYSTEM",
-        tag:"OBSERVATION",
-        bg:"bedroom",
-        bgm:"tension",
-        enterSfx:"tap",
-        still:"bedroom",
-        text:`창밖으로 거대한 중앙정부 탑이 보입니다.<br>
-              거리의 시민들은 모두 무표정…<br><br>
-              <span class="dangerText">가슴 한구석이 답답합니다.</span>`,
+        speaker:"SYSTEM", tag:"OBSERVATION", bg:"bedroom", bgm:"tension", enterSfx:"tap", still:"bedroom",
+        text:`창밖으로 거대한 중앙정부 탑이 보입니다.<br>거리의 시민들은 모두 무표정…<br><br><span class="dangerText">가슴 한구석이 답답합니다.</span>`,
         choices:[
           { text:"이 느낌을 무시하고 출근한다", next:3, emotion:+15 },
           { text:"억제제를 한 번 더 투여한다", next:3, emotion:+5 }
         ]
       },
       3: {
-        speaker:"당신",
-        tag:"CENTRAL PLAZA",
-        bg:"plaza",
-        bgm:"plaza",
-        enterSfx:"door",
-        still:"plaza",
-        text:`수천 명의 시민들이 당신을 바라봅니다.<br><br>
-              “감정은 인류의 적입니다. 우리는 감정을 버림으로써 평화를 얻었습니다…”<br><br>
-              군중 속, 한 여자가 울고 있는 것이 보입니다.`,
+        speaker:"당신", tag:"CENTRAL PLAZA", bg:"plaza", bgm:"plaza", enterSfx:"door", still:"plaza",
+        text:`수천 명의 시민들이 당신을 바라봅니다.<br><br>"감정은 인류의 적입니다. 우리는 감정을 버림으로써 평화를 얻었습니다…"<br><br>군중 속, 한 여자가 울고 있는 것이 보입니다.`,
         choices:[
           { text:"연설을 계속한다 (무시)", next:5, emotion:+20 },
           { text:"경비에게 신호를 보낸다", next:6, emotion:+10 },
@@ -1414,827 +1103,446 @@
         ]
       },
       4: {
-        speaker:"내면의 목소리",
-        tag:"INTRUSION",
-        bg:"bedroom",
-        bgm:"tension",
-        enterSfx:"tap",
-        still:"dossier",
-        text:`“이게 정말 옳은 걸까?”<br><br>
-              <span class="dangerText">위험한 생각입니다.</span>`,
+        speaker:"내면의 목소리", tag:"INTRUSION", bg:"bedroom", bgm:"tension", enterSfx:"tap", still:"dossier",
+        text:`"이게 정말 옳은 걸까?"<br><br><span class="dangerText">위험한 생각입니다.</span>`,
         choices:[ { text:"출근한다", next:3, emotion:+15 } ]
       },
       5: {
-        speaker:"감정 측정기",
-        tag:"ALERT",
-        bg:"plaza",
-        bgm:"tension",
-        enterSfx:"alarm",
-        ai:true,
-        text:`<span class="glitch">경고! 분노 수치 검출!</span><br>
-              수치: <b>47%</b> — 위험 레벨`,
+        speaker:"감정 측정기", tag:"ALERT", bg:"plaza", bgm:"tension", enterSfx:"alarm", ai:true,
+        text:`<span class="glitch">경고! 분노 수치 검출!</span><br>수치: <b>47%</b> — 위험 레벨`,
         choices:[ { text:"→ 다음으로", next:8, emotion:+10 } ]
       },
       6: {
-        speaker:"당신",
-        tag:"CRACK",
-        bg:"plaza",
-        bgm:"tension",
-        enterSfx:"alarm",
-        still:"crowd",
-        text:`경비가 여자를 끌고 갑니다.<br><br>
-              <span class="dangerText">무언가가 찢어지는 느낌.</span><br>
-              그리고… 경보음.`,
+        speaker:"당신", tag:"CRACK", bg:"plaza", bgm:"tension", enterSfx:"alarm", still:"crowd",
+        text:`경비가 여자를 끌고 갑니다.<br><br><span class="dangerText">무언가가 찢어지는 느낌.</span><br>그리고… 경보음.`,
         choices:[ { text:"→ 다음으로", next:8, emotion:+20 } ]
       },
       7: {
-        speaker:"당신",
-        tag:"BREAK",
-        bg:"plaza",
-        bgm:"tension",
-        enterSfx:"alarm",
-        still:"crowd",
-        text:`“그게 죄입니까? 이게 정의입니까?!”<br><br>
-              광장이 흔들립니다. 그리고… <span class="glitch dangerText">경보</span>.`,
+        speaker:"당신", tag:"BREAK", bg:"plaza", bgm:"tension", enterSfx:"alarm", still:"crowd",
+        text:`"그게 죄입니까? 이게 정의입니까?!"<br><br>광장이 흔들립니다. 그리고… <span class="glitch dangerText">경보</span>.`,
         choices:[ { text:"→ 다음으로", next:8, emotion:+35 } ]
       },
-
       8: {
-        speaker:"AI 심문관",
-        tag:"PANOPTICON",
-        bg:"interrogation",
-        bgm:"interrogate",
-        enterSfx:"door",
-        ai:true,
-        text:`심사관 #2847.<br>
-              당신은 공개 석상에서 <b>분노</b>를 표출했습니다.<br><br>
-              지금부터 <b>진술</b>을 입력하십시오.<br>
-              당신의 문장은 <span class="dangerText">감정/의도</span>로 분해됩니다.`,
-        input:{
-          placeholder:"예) 감정은 죄가 아니다. 나는 인간이다. / 억제제를 더 투여해달라…",
-          submitText:"진술 전송"
-        },
+        speaker:"AI 심문관", tag:"PANOPTICON", bg:"interrogation", bgm:"interrogate", enterSfx:"door", ai:true,
+        text:`심사관 #2847.<br>당신은 공개 석상에서 <b>분노</b>를 표출했습니다.<br><br>지금부터 <b>진술</b>을 입력하십시오.<br>당신의 문장은 <span class="dangerText">감정/의도</span>로 분해됩니다.`,
+        input:{ placeholder:"예) 감정은 죄가 아니다. 나는 인간이다. / 억제제를 더 투여해달라…", submitText:"진술 전송" },
         choices:[
-          { text:"(버튼) “나는… 인간입니다.”", next:9, emotion:+15 },
-          { text:"(버튼) “억제제를… 더 주십시오…”", next:10, emotion:-10 },
-          { text:"(버튼) 침묵한다", next:11, emotion:+5 }
+          { text:'(버튼) 「나는… 인간입니다.」', next:9, emotion:+15 },
+          { text:'(버튼) 「억제제를… 더 주십시오…」', next:10, emotion:-10 },
+          { text:'(버튼) 침묵한다', next:11, emotion:+5 }
         ]
       },
-
       9: {
-        speaker:"AI 심문관",
-        tag:"TRANSFER",
-        bg:"interrogation",
-        bgm:"interrogate",
-        enterSfx:"glitch",
-        ai:true,
-        text:`흥미롭군요.<br>
-              이제 당신은 <b>그들</b>과 같습니다.<br><br>
-              <span class="muted">[To Be Continued]</span>`,
+        speaker:"AI 심문관", tag:"TRANSFER", bg:"interrogation", bgm:"interrogate", enterSfx:"glitch", ai:true,
+        text:`흥미롭군요.<br>이제 당신은 <b>그들</b>과 같습니다.<br><br><span class="muted">[To Be Continued]</span>`,
         choices:[]
       },
       10: {
-        speaker:"SYSTEM",
-        tag:"ERASURE",
-        bg:"interrogation",
-        bgm:"erase",
-        enterSfx:"glitch",
-        still:"warning",
-        text:`차가운 주사기.<br>
-              이번엔… <span class="dangerText">아무것도 느껴지지 않습니다.</span><br><br>
-              <b>Bad Ending — 망각</b>`,
+        speaker:"SYSTEM", tag:"ERASURE", bg:"interrogation", bgm:"erase", enterSfx:"glitch", still:"warning",
+        text:`차가운 주사기.<br>이번엔… <span class="dangerText">아무것도 느껴지지 않습니다.</span><br><br><b>Bad Ending — 망각</b>`,
         choices:[]
       },
       11: {
-        speaker:"AI 심문관",
-        tag:"CHOICE",
-        bg:"interrogation",
-        bgm:"interrogate",
-        enterSfx:"tap",
-        ai:true,
-        text:`선택권을 주겠습니다.<br>
-              완전한 감정 제거 수술 후 복귀… 또는 교정시설.<br><br>
-              <span class="muted">[To Be Continued]</span>`,
+        speaker:"AI 심문관", tag:"CHOICE", bg:"interrogation", bgm:"interrogate", enterSfx:"tap", ai:true,
+        text:`선택권을 주겠습니다.<br>완전한 감정 제거 수술 후 복귀… 또는 교정시설.<br><br><span class="muted">[To Be Continued]</span>`,
         choices:[]
       }
     };
 
-    // ---------- portrait (AI) canvas face ----------
+    // ---------- portrait (AI pixel face) ----------
     const portrait = { W:96, H:96, visible:false, talk:false, lipTimer:null, lastTs:0 };
     const pctx = el.portraitCanvas?.getContext?.("2d") || null;
     const pOff = document.createElement("canvas");
-    pOff.width = portrait.W; pOff.height = portrait.H;
+    pOff.width=portrait.W; pOff.height=portrait.H;
     const pOffCtx = pOff.getContext("2d");
-    if(pctx) pctx.imageSmoothingEnabled = false;
-    if(pOffCtx) pOffCtx.imageSmoothingEnabled = false;
+    if(pctx) pctx.imageSmoothingEnabled=false;
+    if(pOffCtx) pOffCtx.imageSmoothingEnabled=false;
 
-    const rgba = (rgb, a)=> `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${a})`;
+    const rgba=(rgb,a)=>`rgba(${rgb[0]},${rgb[1]},${rgb[2]},${a})`;
 
-    function drawDotFace(ctx, talk, risk){
-      const W = portrait.W;
-      const G = 32;
-      const S = W / G;
-
-      const alarm = risk >= 75;
-      const main = alarm ? [255,59,59] : [0,212,255];
-      const faint = alarm ? [255,110,110] : [170,245,255];
-
-      ctx.setTransform(1,0,0,1,0,0);
-      ctx.clearRect(0,0,W,W);
-
-      ctx.setTransform(S,0,0,S,0,0);
-      ctx.clearRect(0,0,G,G);
-
-      ctx.fillStyle = rgba([0,0,0], 0.30);
-      ctx.fillRect(0,0,G,G);
-
-      ctx.fillStyle = rgba(main, 0.35);
-      ctx.fillRect(1,1,G-2,1);
-      ctx.fillRect(1,G-2,G-2,1);
-      ctx.fillRect(1,2,1,G-4);
-      ctx.fillRect(G-2,2,1,G-4);
-
-      const cx=16, cy=16, r=10.8;
+    function drawDotFace(ctx,talk,risk){
+      const W=portrait.W, G=32, S=W/G;
+      const alarm=risk>=75;
+      const main=alarm?[255,59,59]:[0,212,255];
+      const faint=alarm?[255,110,110]:[170,245,255];
+      ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,W,W);
+      ctx.setTransform(S,0,0,S,0,0); ctx.clearRect(0,0,G,G);
+      ctx.fillStyle=rgba([0,0,0],0.30); ctx.fillRect(0,0,G,G);
+      ctx.fillStyle=rgba(main,0.35);
+      ctx.fillRect(1,1,G-2,1); ctx.fillRect(1,G-2,G-2,1);
+      ctx.fillRect(1,2,1,G-4); ctx.fillRect(G-2,2,1,G-4);
+      const cx=16,cy=16,r=10.8;
       for(let y=0;y<G;y++){
         for(let x=0;x<G;x++){
-          const dx = (x+0.5) - cx;
-          const dy = (y+0.5) - cy;
-          const d = Math.sqrt(dx*dx + dy*dy);
-
-          if(d < r){
-            const a = 0.05 + (1 - d/r)*0.10;
-            ctx.fillStyle = rgba(faint, a);
-            ctx.fillRect(x,y,1,1);
-          }
-          if(Math.abs(d - r) < 0.55){
-            ctx.fillStyle = rgba(main, 0.75);
-            ctx.fillRect(x,y,1,1);
-          }
+          const dx=(x+0.5)-cx, dy=(y+0.5)-cy;
+          const d=Math.sqrt(dx*dx+dy*dy);
+          if(d<r){ ctx.fillStyle=rgba(faint,0.05+(1-d/r)*0.10); ctx.fillRect(x,y,1,1); }
+          if(Math.abs(d-r)<0.55){ ctx.fillStyle=rgba(main,0.75); ctx.fillRect(x,y,1,1); }
         }
       }
-
-      ctx.fillStyle = rgba(main, 0.88);
-      ctx.fillRect(12,14,2,2);
-      ctx.fillRect(18,14,2,2);
-
-      ctx.fillStyle = rgba(main, 0.25);
-      ctx.fillRect(10,13,6,1);
-      ctx.fillRect(16,13,6,1);
-
-      ctx.fillStyle = rgba(main, 0.28);
-      ctx.fillRect(16,17,1,1);
-
+      ctx.fillStyle=rgba(main,0.88);
+      ctx.fillRect(12,14,2,2); ctx.fillRect(18,14,2,2);
+      ctx.fillStyle=rgba(main,0.25);
+      ctx.fillRect(10,13,6,1); ctx.fillRect(16,13,6,1);
+      ctx.fillStyle=rgba(main,0.28); ctx.fillRect(16,17,1,1);
       if(talk){
-        ctx.fillStyle = rgba(main, 0.85);
-        ctx.fillRect(14,20,4,1);
-        ctx.fillRect(14,21,1,2);
-        ctx.fillRect(17,21,1,2);
-        ctx.fillStyle = rgba([0,0,0], 0.35);
-        ctx.fillRect(15,21,2,2);
+        ctx.fillStyle=rgba(main,0.85);
+        ctx.fillRect(14,20,4,1); ctx.fillRect(14,21,1,2); ctx.fillRect(17,21,1,2);
+        ctx.fillStyle=rgba([0,0,0],0.35); ctx.fillRect(15,21,2,2);
       }else{
-        ctx.fillStyle = rgba(main, 0.72);
-        ctx.fillRect(14,21,4,1);
+        ctx.fillStyle=rgba(main,0.72); ctx.fillRect(14,21,4,1);
       }
     }
 
     function renderPortraitFrame(){
-      if(!pctx || !pOffCtx) return;
+      if(!pctx||!pOffCtx) return;
       if(!portrait.visible) return;
-
-      const risk = clamp(state.threat?.risk ?? 0, 0, 100);
-      const intensity = (risk/100) * (state.typing.active ? 1.15 : 1.0);
-
-      drawDotFace(pOffCtx, portrait.talk, risk);
-
+      const risk=clamp(state.threat?.risk??0,0,100);
+      // FIX: was "inteFnsity" (capital F typo) — now correctly "intensity"
+      const intensity=(risk/100)*(state.typing.active?1.15:1.0);
+      drawDotFace(pOffCtx,portrait.talk,risk);
       pctx.setTransform(1,0,0,1,0,0);
-      pctx.clearRect(0,0,portrait.W, portrait.H);
-
-      const maxShift = intensity * 6;
-      let y = 0;
-      while(y < portrait.H){
-        const sliceH = Math.floor(4 + Math.random()*10);
-        const dx = (Math.random()-0.5) * maxShift;
-        pctx.drawImage(pOff, 0, y, portrait.W, sliceH, dx, y, portrait.W, sliceH);
-        y += sliceH;
+      pctx.clearRect(0,0,portrait.W,portrait.H);
+      const maxShift=intensity*6;
+      let y=0;
+      while(y<portrait.H){
+        const sliceH=Math.floor(4+Math.random()*10);
+        const dx=(Math.random()-0.5)*maxShift;
+        pctx.drawImage(pOff,0,y,portrait.W,sliceH,dx,y,portrait.W,sliceH);
+        y+=sliceH;
       }
-
-      const noiseCount = Math.floor(40 + intensity*220);
-      const alphaBase = 0.04 + intensity*0.12;
+      const noiseCount=Math.floor(40+intensity*220);
+      const alphaBase=0.04+intensity*0.12;  // ← BUG FIXED: was "inteFnsity"
       for(let i=0;i<noiseCount;i++){
-        const x = (Math.random()*portrait.W) | 0;
-        const yy = (Math.random()*portrait.H) | 0;
-        pctx.fillStyle = `rgba(255,255,255,${alphaBase*Math.random()})`;
+        const x=(Math.random()*portrait.W)|0;
+        const yy=(Math.random()*portrait.H)|0;
+        pctx.fillStyle=`rgba(255,255,255,${alphaBase*Math.random()})`;
         pctx.fillRect(x,yy,1,1);
       }
     }
 
     function showPortrait(on){
-      portrait.visible = !!on;
-      el.portraitDock.classList.toggle("on", portrait.visible);
-      if(!portrait.visible){
-        stopLipSync();
-      }else{
-        renderPortraitFrame();
-      }
+      portrait.visible=!!on;
+      el.portraitDock.classList.toggle("on",portrait.visible);
+      if(!portrait.visible){ stopLipSync(); }
+      else { renderPortraitFrame(); }
     }
 
     function startLipSync(){
       stopLipSync();
       el.portraitDock.classList.add("talk");
-      portrait.talk = true;
-
-      portrait.lipTimer = setInterval(()=>{
-        portrait.talk = !portrait.talk;
-        renderPortraitFrame();
-      }, 120);
+      portrait.talk=true;
+      portrait.lipTimer=setInterval(()=>{ portrait.talk=!portrait.talk; renderPortraitFrame(); },120);
     }
 
     function stopLipSync(){
-      if(portrait.lipTimer){
-        clearInterval(portrait.lipTimer);
-        portrait.lipTimer = null;
-      }
+      if(portrait.lipTimer){ clearInterval(portrait.lipTimer); portrait.lipTimer=null; }
       el.portraitDock.classList.remove("talk");
-      portrait.talk = false;
+      portrait.talk=false;
       renderPortraitFrame();
     }
 
     function portraitLoop(ts){
-      if(portrait.visible && pctx){
-        if(ts - portrait.lastTs > 90){
-          renderPortraitFrame();
-          portrait.lastTs = ts;
-        }
+      if(portrait.visible&&pctx){
+        if(ts-portrait.lastTs>90){ renderPortraitFrame(); portrait.lastTs=ts; }
       }
       requestAnimationFrame(portraitLoop);
     }
     requestAnimationFrame(portraitLoop);
 
     // ---------- UI helpers ----------
-    function setAISpeak(on){
-      if(on) el.aiWrap.classList.add("speak");
-      else el.aiWrap.classList.remove("speak");
-    }
+    function setAISpeak(on){ if(on) el.aiWrap.classList.add("speak"); else el.aiWrap.classList.remove("speak"); }
 
     function applyBackground(scene){
-      const url = BG_MAP[scene.bg];
-      if(url) document.documentElement.style.setProperty("--bg", `url("${url}")`);
+      const url=BG_MAP[scene.bg];
+      if(url) document.documentElement.style.setProperty("--bg",`url("${url}")`);
     }
 
     function applyEmotionUI(){
-      const pct = clamp(state.emotion, 0, 100);
-      el.fill.style.width = pct + "%";
-      el.emotionText.textContent = pct + "%";
-      if (pct >= 70) el.emotionText.style.color = "var(--danger)";
-      else if (pct >= 35) el.emotionText.style.color = "var(--warn)";
-      else el.emotionText.style.color = "var(--ok)";
-
-      const baseMin = state.options.aiAlways ? 0.10 : 0.02;
-      const base = clamp(baseMin + (pct/100)*0.22, 0.02, 0.28);
-      document.documentElement.style.setProperty("--aiBaseOpacity", base.toFixed(2));
-      document.documentElement.style.setProperty("--aiGlow", (0.12 + (pct/100)*0.40).toFixed(2));
-      document.documentElement.style.setProperty("--aiBlur", (pct >= 75 ? "0.25px" : "0px"));
-      document.documentElement.style.setProperty("--aiScale", (1.02 + (pct/100)*0.05).toFixed(3));
+      const pct=clamp(state.emotion,0,100);
+      el.fill.style.width=pct+"%";
+      el.emotionText.textContent=pct+"%";
+      if(pct>=70) el.emotionText.style.color="var(--danger)";
+      else if(pct>=35) el.emotionText.style.color="var(--warn)";
+      else el.emotionText.style.color="var(--ok)";
+      const baseMin=state.options.aiAlways?0.10:0.02;
+      const base=clamp(baseMin+(pct/100)*0.22,0.02,0.28);
+      document.documentElement.style.setProperty("--aiBaseOpacity",base.toFixed(2));
+      document.documentElement.style.setProperty("--aiGlow",(0.12+(pct/100)*0.40).toFixed(2));
+      document.documentElement.style.setProperty("--aiBlur",(pct>=75?"0.25px":"0px"));
+      document.documentElement.style.setProperty("--aiScale",(1.02+(pct/100)*0.05).toFixed(3));
     }
 
-    // ---------- threat UI + broll motion driven ----------
     function applyThreatUI(){
-      const risk = clamp(state.threat?.risk ?? 0, 0, 100);
-      const level = risk / 100;
-
-      const noise = clamp(0.02 + level * 0.30, 0, 0.32);
-      const ghost = clamp(level * 0.55, 0, 0.55);
-      const jitter = clamp(0.22 - level * 0.14, 0.08, 0.22);
-      const noiseDur = clamp(0.55 - level * 0.30, 0.25, 0.55);
-
-      document.documentElement.style.setProperty("--noiseOpacity", noise.toFixed(2));
-      document.documentElement.style.setProperty("--ghostOpacity", ghost.toFixed(2));
-      document.documentElement.style.setProperty("--jitterDur", jitter.toFixed(2) + "s");
-      document.documentElement.style.setProperty("--noiseDur", noiseDur.toFixed(2) + "s");
-
-      // broll visual response
-      const wobble = (risk >= 55) ? (0.6 + level*1.8) : 0;
-      const hue = (risk >= 75) ? (8 + level*16) : 0;
-      const sat = clamp(1.05 + level*0.25, 1.05, 1.35);
-      const con = clamp(1.08 + level*0.25, 1.08, 1.40);
-
-      document.documentElement.style.setProperty("--brollWobble", wobble.toFixed(2) + "px");
-      document.documentElement.style.setProperty("--brollHue", hue.toFixed(2) + "deg");
-      document.documentElement.style.setProperty("--brollSat", sat.toFixed(2));
-      document.documentElement.style.setProperty("--brollCon", con.toFixed(2));
-
-      el.aiWrap.classList.toggle("threat", risk > 0);
-
-      el.hud.classList.toggle("on", risk > 0);
-      el.hud.classList.toggle("alarm", risk >= 75);
-      el.riskValue.textContent = `${risk}%`;
-      el.riskFill.style.width = `${risk}%`;
-      el.affectText.textContent = `AFFECT: ${state.threat?.affect || "—"}`;
-      el.consistencyText.textContent = `CONSISTENCY: ${state.threat?.consistency ?? "—"}%`;
-
-      el.app.classList.toggle("alarm", risk >= 80);
-
-      el.portraitDock.classList.toggle("alarm", risk >= 75);
-      el.brollDock.classList.toggle("alarm", risk >= 75);
-      el.brollDock.classList.toggle("wobble", risk >= 55);
+      const risk=clamp(state.threat?.risk??0,0,100);
+      const level=risk/100;
+      document.documentElement.style.setProperty("--noiseOpacity",clamp(0.02+level*0.30,0,0.32).toFixed(2));
+      document.documentElement.style.setProperty("--ghostOpacity",clamp(level*0.55,0,0.55).toFixed(2));
+      document.documentElement.style.setProperty("--jitterDur",clamp(0.22-level*0.14,0.08,0.22).toFixed(2)+"s");
+      document.documentElement.style.setProperty("--noiseDur",clamp(0.55-level*0.30,0.25,0.55).toFixed(2)+"s");
+      const wobble=(risk>=55)?(0.6+level*1.8):0;
+      const hue=(risk>=75)?(8+level*16):0;
+      const sat=clamp(1.05+level*0.25,1.05,1.35);
+      const con=clamp(1.08+level*0.25,1.08,1.40);
+      document.documentElement.style.setProperty("--brollWobble",wobble.toFixed(2)+"px");
+      document.documentElement.style.setProperty("--brollHue",hue.toFixed(2)+"deg");
+      document.documentElement.style.setProperty("--brollSat",sat.toFixed(2));
+      document.documentElement.style.setProperty("--brollCon",con.toFixed(2));
+      el.aiWrap.classList.toggle("threat",risk>0);
+      el.hud.classList.toggle("on",risk>0);
+      el.hud.classList.toggle("alarm",risk>=75);
+      el.riskValue.textContent=`${risk}%`;
+      el.riskFill.style.width=`${risk}%`;
+      el.affectText.textContent=`AFFECT: ${state.threat?.affect||"—"}`;
+      el.consistencyText.textContent=`CONSISTENCY: ${state.threat?.consistency??"—"}%`;
+      el.app.classList.toggle("alarm",risk>=80);
+      el.portraitDock.classList.toggle("alarm",risk>=75);
+      el.brollDock.classList.toggle("alarm",risk>=75);
+      el.brollDock.classList.toggle("wobble",risk>=55);
     }
 
-    function isAIScene(scene){
-      const s = (scene.speaker || "");
-      return !!scene.ai || s.includes("AI");
-    }
+    function isAIScene(scene){ return !!scene.ai||(scene.speaker||"").includes("AI"); }
 
     // ---------- typewriter ----------
-    function tokenizeHTML(html){
-      const parts = html.split(/(<[^>]+>)/g).filter(Boolean);
-      return parts.map(p => p.startsWith("<") ? {type:"tag", v:p} : {type:"text", v:p});
-    }
+    function tokenizeHTML(html){ return html.split(/(<[^>]+>)/g).filter(Boolean).map(p=>p.startsWith("<")?{type:"tag",v:p}:{type:"text",v:p}); }
 
     function stopTyping(){
-      const t = state.typing;
+      const t=state.typing;
       if(t.timer) clearTimeout(t.timer);
-      state.typing = { active:false, fullHTML:"", buffer:"", tokens:[], ti:0, ci:0, timer:null, skip:false };
+      state.typing={active:false,fullHTML:"",buffer:"",tokens:[],ti:0,ci:0,timer:null,skip:false};
       el.hint.classList.remove("on");
     }
 
-    function skipTyping(){
-      const t = state.typing;
-      if(!t.active) return;
-      t.skip = true;
-    }
+    function skipTyping(){ if(state.typing.active) state.typing.skip=true; }
 
-    function startTyping(html, speedMs=16, onDone=()=>{}){
+    function startTyping(html,speedMs=16,onDone=()=>{}){
       stopTyping();
-      const t = state.typing;
-
-      t.active = true;
-      t.fullHTML = html;
-      t.tokens = tokenizeHTML(html);
-      t.ti = 0; t.ci = 0;
-      t.buffer = "";
-      t.skip = false;
-
-      el.text.innerHTML = "";
-      el.hint.classList.add("on");
-
-      const tick = ()=>{
+      const t=state.typing;
+      t.active=true; t.fullHTML=html; t.tokens=tokenizeHTML(html);
+      t.ti=0; t.ci=0; t.buffer=""; t.skip=false;
+      el.text.innerHTML=""; el.hint.classList.add("on");
+      const tick=()=>{
         if(!t.active) return;
-
-        if(t.skip){
-          el.text.innerHTML = t.fullHTML;
-          t.active = false;
-          el.hint.classList.remove("on");
-          onDone();
-          return;
-        }
-
-        if(t.ti >= t.tokens.length){
-          t.active = false;
-          el.hint.classList.remove("on");
-          onDone();
-          return;
-        }
-
-        const tok = t.tokens[t.ti];
-        if(tok.type === "tag"){
-          t.buffer += tok.v;
-          t.ti++;
-          el.text.innerHTML = t.buffer;
-          t.timer = setTimeout(tick, 0);
-          return;
-        }
-
-        const ch = tok.v.charAt(t.ci);
-        t.buffer += ch;
-        t.ci++;
-
-        if(t.ci >= tok.v.length){
-          t.ti++;
-          t.ci = 0;
-        }
-        el.text.innerHTML = t.buffer;
-        t.timer = setTimeout(tick, speedMs);
+        if(t.skip){ el.text.innerHTML=t.fullHTML; t.active=false; el.hint.classList.remove("on"); onDone(); return; }
+        if(t.ti>=t.tokens.length){ t.active=false; el.hint.classList.remove("on"); onDone(); return; }
+        const tok=t.tokens[t.ti];
+        if(tok.type==="tag"){ t.buffer+=tok.v; t.ti++; el.text.innerHTML=t.buffer; t.timer=setTimeout(tick,0); return; }
+        t.buffer+=tok.v.charAt(t.ci); t.ci++;
+        if(t.ci>=tok.v.length){ t.ti++; t.ci=0; }
+        el.text.innerHTML=t.buffer;
+        t.timer=setTimeout(tick,speedMs);
       };
-
       tick();
     }
 
-    el.text.addEventListener("click", ()=>{
-      if(state.typing.active){
-        audio.sfx("tap"); haptic(8);
-        skipTyping();
-      }
-    });
+    el.text.addEventListener("click",()=>{ if(state.typing.active){ audio.sfx("tap"); haptic(8); skipTyping(); } });
 
-    // ---------- interrogation analysis ----------
+    // ---------- interrogation ----------
     function analyzeInterrogation(raw){
-      const text = (raw || "").trim();
-      const t = text.replace(/\s+/g," ");
-
-      const resist = ["인간","자유","해방","부당","거짓","반항","저항","정의","죄가 아니다","감정은 죄"];
-      const submit = ["억제","억제제","제거","수술","복종","규정","죄송","용서","실수","명령"];
-      const confuse = ["모르","혼란","이해","질문","왜","무슨","어떻게"];
-
-      const anger = ["분노","화","증오","부숴","망","죽","꺼져","저주","불태","찢"];
-      const calm  = ["평화","안정","침착","질서","규율","규정"];
-
-      const hit = (arr)=> arr.reduce((acc,w)=> acc + (t.includes(w)?1:0), 0);
-
-      let sR = hit(resist);
-      let sS = hit(submit);
-      let sC = hit(confuse);
-
-      let label = "혼란";
-      let next = 11;
-      if(sR > sS && sR >= sC){ label="저항"; next=9; }
-      else if(sS > sR && sS >= sC){ label="순응"; next=10; }
-      else { label="혼란"; next=11; }
-
-      const a = hit(anger);
-      const c = hit(calm);
-      let delta = 5 + a*10 - c*6;
-      if(label === "순응") delta -= 12;
-      if(label === "저항") delta += 8;
-      delta = clamp(delta, -20, 35);
-
-      const risk = clamp(40 + sR*18 + a*10 - sS*12, 5, 95);
-
-      const picked = [];
-      [...resist, ...submit, ...confuse, ...anger].forEach(w=>{
-        if(t.includes(w) && picked.length < 6) picked.push(w);
-      });
-
-      const contradiction = Math.min(sR, sS);
-      let consistency = clamp(100 - contradiction*35 - sC*12 - a*7, 15, 100);
-
-      let affect = "NEUTRAL";
-      if (a > 0) affect = "ANGER";
-      else if (label === "저항") affect = "DEFIANCE";
-      else if (label === "순응") affect = "SUBMISSION";
-      else if (sC > 0) affect = "CONFUSION";
-
-      return { label, next, delta, risk, picked, consistency, affect };
+      const text=(raw||"").trim().replace(/\s+/g," ");
+      const hit=(arr)=>arr.reduce((acc,w)=>acc+(text.includes(w)?1:0),0);
+      const resist=["인간","자유","해방","부당","거짓","반항","저항","정의","죄가 아니다","감정은 죄"];
+      const submit=["억제","억제제","제거","수술","복종","규정","죄송","용서","실수","명령"];
+      const confuse=["모르","혼란","이해","질문","왜","무슨","어떻게"];
+      const anger=["분노","화","증오","부숴","망","죽","꺼져","저주","불태","찢"];
+      const calm=["평화","안정","침착","질서","규율","규정"];
+      const sR=hit(resist),sS=hit(submit),sC=hit(confuse);
+      let label="혼란",next=11;
+      if(sR>sS&&sR>=sC){label="저항";next=9;}
+      else if(sS>sR&&sS>=sC){label="순응";next=10;}
+      const a=hit(anger),c=hit(calm);
+      let delta=clamp(5+a*10-c*6+(label==="저항"?8:0)+(label==="순응"?-12:0),-20,35);
+      const risk=clamp(40+sR*18+a*10-sS*12,5,95);
+      const picked=[];
+      [...resist,...submit,...confuse,...anger].forEach(w=>{ if(text.includes(w)&&picked.length<6) picked.push(w); });
+      const consistency=clamp(100-Math.min(sR,sS)*35-sC*12-a*7,15,100);
+      let affect="NEUTRAL";
+      if(a>0) affect="ANGER";
+      else if(label==="저항") affect="DEFIANCE";
+      else if(label==="순응") affect="SUBMISSION";
+      else if(sC>0) affect="CONFUSION";
+      return{label,next,delta,risk,picked,consistency,affect};
     }
 
     function getScene(){
-      if(state.sceneId === -1 && state.tempScene) return state.tempScene;
-      return SCENES[state.sceneId] || SCENES[0];
+      if(state.sceneId===-1&&state.tempScene) return state.tempScene;
+      return SCENES[state.sceneId]||SCENES[0];
     }
 
     function submitInterrogation(){
-      const scene = getScene();
-      if(!scene || !scene.input) return;
-
-      const raw = el.userInput.value;
-      const text = (raw || "").trim();
-      if(!text){
-        audio.sfx("tap"); haptic(10);
-        return;
-      }
-
-      audio.ensure();
-      audio.sfx("confirm"); haptic(14);
-
-      const r = analyzeInterrogation(text);
-
-      const prevRisk = state.threat.risk || 0;
-      state.threat = { risk: r.risk, affect: r.affect, consistency: r.consistency };
+      const scene=getScene();
+      if(!scene||!scene.input) return;
+      const raw=el.userInput.value;
+      const text=(raw||"").trim();
+      if(!text){ audio.sfx("tap"); haptic(10); return; }
+      audio.ensure(); audio.sfx("confirm"); haptic(14);
+      const r=analyzeInterrogation(text);
+      const prevRisk=state.threat.risk||0;
+      state.threat={risk:r.risk,affect:r.affect,consistency:r.consistency};
       applyThreatUI();
-
-      if (r.risk >= 80 && prevRisk < 80) {
-        audio.sfx("alarm");
-        haptic(30);
-      }
-
-      state.emotion = clamp(state.emotion + r.delta, 0, 100);
-
-      pushLog({
-        type:"input",
-        sceneId: state.sceneId,
-        text,
-        result: `분류=${r.label} / RISK=${r.risk}% / CONSIST=${r.consistency}% / AFFECT=${r.affect} / ΔE ${r.delta>=0?"+":""}${r.delta} / 키워드=${r.picked.join(", ")||"—"}`
-      });
-
-      // analysis scene is AI → portrait
-      state.tempScene = {
-        speaker:"AI 심문관",
-        tag:"ANALYSIS",
-        bg:"interrogation",
-        bgm:"interrogate",
-        enterSfx:"glitch",
-        ai:true,
-        text:`진술 기록 완료.<br>
-              의도 분류: <b>${r.label}</b><br>
-              감정 파형: <span class="dangerText">${r.risk}% 위험</span><br>
-              일관성: <b>${r.consistency}%</b><br><br>
-              검출 키워드: <span class="muted">${(r.picked.join(", ")||"—")}</span>`,
-        choices:[ { text:"→ 다음", next:r.next, emotion:0 } ]
+      if(r.risk>=80&&prevRisk<80){ audio.sfx("alarm"); haptic(30); }
+      state.emotion=clamp(state.emotion+r.delta,0,100);
+      pushLog({type:"input",sceneId:state.sceneId,text,result:`분류=${r.label} / RISK=${r.risk}% / CONSIST=${r.consistency}% / AFFECT=${r.affect} / ΔE ${r.delta>=0?"+":""}${r.delta} / 키워드=${r.picked.join(", ")||"—"}`});
+      state.tempScene={
+        speaker:"AI 심문관",tag:"ANALYSIS",bg:"interrogation",bgm:"interrogate",enterSfx:"glitch",ai:true,
+        text:`진술 기록 완료.<br>의도 분류: <b>${r.label}</b><br>감정 파형: <span class="dangerText">${r.risk}% 위험</span><br>일관성: <b>${r.consistency}%</b><br><br>검출 키워드: <span class="muted">${(r.picked.join(", ")||"—")}</span>`,
+        choices:[{text:"→ 다음",next:r.next,emotion:0}]
       };
-
-      el.userInput.value = "";
-      state.sceneId = -1;
-      render();
-      autosave();
-      renderLog();
+      el.userInput.value=""; state.sceneId=-1; render(); autosave(); renderLog();
     }
 
-    el.sendBtn.addEventListener("click", submitInterrogation);
+    el.sendBtn.addEventListener("click",submitInterrogation);
 
     // ---------- log ----------
-    function pushLog(entry){
-      state.log.push({ t: nowTs(), ...entry });
-      if(state.log.length > 300) state.log = state.log.slice(-300);
-    }
-
+    function pushLog(entry){ state.log.push({t:nowTs(),...entry}); if(state.log.length>300) state.log=state.log.slice(-300); }
     function renderLog(){
-      const lines = state.log.map((x)=>{
-        const t = fmtTime(x.t);
-        if(x.type === "choice"){
-          return `[${t}] CHOICE @${x.sceneId} → "${x.choice}" (ΔE ${x.emotionDelta>=0?"+":""}${x.emotionDelta})`;
-        }
-        if(x.type === "input"){
-          return `[${t}] INPUT  @${x.sceneId} → "${x.text}"\n        ↳ ${x.result}`;
-        }
-        if(x.type === "system"){
-          return `[${t}] SYS    ${x.msg}`;
-        }
+      const lines=state.log.map((x)=>{
+        const t=fmtTime(x.t);
+        if(x.type==="choice") return `[${t}] CHOICE @${x.sceneId} → "${x.choice}" (ΔE ${x.emotionDelta>=0?"+":""}${x.emotionDelta})`;
+        if(x.type==="input") return `[${t}] INPUT  @${x.sceneId} → "${x.text}"\n        ↳ ${x.result}`;
+        if(x.type==="system") return `[${t}] SYS    ${x.msg}`;
         return `[${t}] ${JSON.stringify(x)}`;
       });
-      el.logBox.textContent = lines.join("\n");
+      el.logBox.textContent=lines.join("\n");
     }
 
     // ---------- save/load ----------
     function autosave(){
-      try{
-        localStorage.setItem(AUTO_KEY, JSON.stringify({
-          sceneId: state.sceneId,
-          emotion: state.emotion,
-          options: state.options,
-          log: state.log,
-          threat: state.threat,
-          tempScene: state.tempScene
-        }));
-      }catch(e){}
+      try{ localStorage.setItem(AUTO_KEY,JSON.stringify({sceneId:state.sceneId,emotion:state.emotion,options:state.options,log:state.log,threat:state.threat,tempScene:state.tempScene})); }catch(e){}
     }
-
     function autoload(){
       try{
-        const raw = localStorage.getItem(AUTO_KEY);
-        if(!raw) return;
-        const data = JSON.parse(raw);
-        if(typeof data.sceneId === "number") state.sceneId = data.sceneId;
-        if(typeof data.emotion === "number") state.emotion = data.emotion;
-        if(data.options) state.options = { ...state.options, ...data.options };
-        if(Array.isArray(data.log)) state.log = data.log;
-        if(data.threat) state.threat = { ...state.threat, ...data.threat };
-        if(data.tempScene) state.tempScene = data.tempScene;
+        const raw=localStorage.getItem(AUTO_KEY); if(!raw) return;
+        const data=JSON.parse(raw);
+        if(typeof data.sceneId==="number") state.sceneId=data.sceneId;
+        if(typeof data.emotion==="number") state.emotion=data.emotion;
+        if(data.options) state.options={...state.options,...data.options};
+        if(Array.isArray(data.log)) state.log=data.log;
+        if(data.threat) state.threat={...state.threat,...data.threat};
+        if(data.tempScene) state.tempScene=data.tempScene;
       }catch(e){}
     }
-
     function saveSlot(n){
       try{
-        localStorage.setItem(SLOT_KEY(n), JSON.stringify({
-          sceneId: state.sceneId,
-          emotion: state.emotion,
-          options: state.options,
-          log: state.log,
-          threat: state.threat,
-          tempScene: state.tempScene,
-          ts: nowTs()
-        }));
-        pushLog({ type:"system", msg:`슬롯${n} 저장` });
-        autosave();
-        audio.sfx("confirm"); haptic(12);
-        updateSlotMeta();
-        renderLog();
+        localStorage.setItem(SLOT_KEY(n),JSON.stringify({sceneId:state.sceneId,emotion:state.emotion,options:state.options,log:state.log,threat:state.threat,tempScene:state.tempScene,ts:nowTs()}));
+        pushLog({type:"system",msg:`슬롯${n} 저장`}); autosave(); audio.sfx("confirm"); haptic(12); updateSlotMeta(); renderLog();
       }catch(e){}
     }
-
     function loadSlot(n){
       try{
-        const raw = localStorage.getItem(SLOT_KEY(n));
-        if(!raw) return;
-        const data = JSON.parse(raw);
-        if(typeof data.sceneId === "number") state.sceneId = data.sceneId;
-        if(typeof data.emotion === "number") state.emotion = data.emotion;
-        if(data.options) state.options = { ...state.options, ...data.options };
-        if(Array.isArray(data.log)) state.log = data.log;
-        if(data.threat) state.threat = { ...state.threat, ...data.threat };
-        state.tempScene = data.tempScene || null;
-
-        syncOptionsUI();
-        render();
-        pushLog({ type:"system", msg:`슬롯${n} 불러오기` });
-        autosave();
-        audio.sfx("confirm"); haptic(14);
-        updateSlotMeta();
-        renderLog();
+        const raw=localStorage.getItem(SLOT_KEY(n)); if(!raw) return;
+        const data=JSON.parse(raw);
+        if(typeof data.sceneId==="number") state.sceneId=data.sceneId;
+        if(typeof data.emotion==="number") state.emotion=data.emotion;
+        if(data.options) state.options={...state.options,...data.options};
+        if(Array.isArray(data.log)) state.log=data.log;
+        if(data.threat) state.threat={...state.threat,...data.threat};
+        state.tempScene=data.tempScene||null;
+        syncOptionsUI(); render(); pushLog({type:"system",msg:`슬롯${n} 불러오기`});
+        autosave(); audio.sfx("confirm"); haptic(14); updateSlotMeta(); renderLog();
       }catch(e){}
     }
-
     function updateSlotMeta(){
-      const m = [1,2,3].map((n)=>{
+      const m=[1,2,3].map((n)=>{
         try{
-          const raw = localStorage.getItem(SLOT_KEY(n));
-          if(!raw) return `슬롯${n}: —`;
-          const data = JSON.parse(raw);
-          return `슬롯${n}: ${fmtTime(data.ts)} (Scene ${data.sceneId}, E ${data.emotion}%, RISK ${data.threat?.risk ?? 0}%)`;
-        }catch(e){
-          return `슬롯${n}: —`;
-        }
+          const raw=localStorage.getItem(SLOT_KEY(n)); if(!raw) return `슬롯${n}: —`;
+          const data=JSON.parse(raw);
+          return `슬롯${n}: ${fmtTime(data.ts)} (Scene ${data.sceneId}, E ${data.emotion}%, RISK ${data.threat?.risk??0}%)`;
+        }catch(e){ return `슬롯${n}: —`; }
       }).join("\n");
-      el.slotMeta.textContent = m;
+      el.slotMeta.textContent=m;
     }
 
     // ---------- rendering ----------
     function buildChoices(scene){
-      el.choices.innerHTML = "";
-      if(scene.choices && scene.choices.length){
+      el.choices.innerHTML="";
+      if(scene.choices&&scene.choices.length){
         scene.choices.forEach(ch=>{
-          const b = document.createElement("button");
-          b.className = "choice";
-          b.textContent = ch.text;
-          b.onclick = ()=> choose(ch);
-          el.choices.appendChild(b);
+          const b=document.createElement("button");
+          b.className="choice"; b.textContent=ch.text;
+          b.onclick=()=>choose(ch); el.choices.appendChild(b);
         });
       }else{
-        const b = document.createElement("button");
-        b.className = "choice";
-        b.textContent = "🔄 처음부터 다시 시작";
-        b.onclick = resetGame;
-        el.choices.appendChild(b);
+        const b=document.createElement("button");
+        b.className="choice"; b.textContent="🔄 처음부터 다시 시작";
+        b.onclick=resetGame; el.choices.appendChild(b);
       }
     }
 
     function showInput(scene){
-      if(scene.input){
-        el.inputWrap.classList.add("on");
-        el.userInput.placeholder = scene.input.placeholder || "진술을 입력하세요…";
-        el.sendBtn.textContent = scene.input.submitText || "전송";
-      }else{
-        el.inputWrap.classList.remove("on");
-      }
+      if(scene.input){ el.inputWrap.classList.add("on"); el.userInput.placeholder=scene.input.placeholder||"진술을 입력하세요…"; el.sendBtn.textContent=scene.input.submitText||"전송"; }
+      else{ el.inputWrap.classList.remove("on"); }
     }
 
     function onEnterScene(scene){
       applyBackground(scene);
-
-      if(state.options.sound){
-        audio.setTheme(scene.bgm || "idle");
-        if(scene.enterSfx) audio.sfx(scene.enterSfx);
-      }
-
-      applyEmotionUI();
-      applyThreatUI();
-      autosave();
+      if(state.options.sound){ audio.setTheme(scene.bgm||"idle"); if(scene.enterSfx) audio.sfx(scene.enterSfx); }
+      applyEmotionUI(); applyThreatUI(); autosave();
     }
 
     function render(){
-      const scene = getScene();
-
-      el.speaker.textContent = scene.speaker || "SYSTEM";
-      el.tag.textContent = scene.tag || "AUTO-SAVE";
-
-      el.choices.innerHTML = "";
-      el.inputWrap.classList.remove("on");
-
-      const aiLine = isAIScene(scene);
-
+      const scene=getScene();
+      el.speaker.textContent=scene.speaker||"SYSTEM";
+      el.tag.textContent=scene.tag||"AUTO-SAVE";
+      el.choices.innerHTML=""; el.inputWrap.classList.remove("on");
+      const aiLine=isAIScene(scene);
       onEnterScene(scene);
-
       if(aiLine){
-        // AI: portrait on, broll off
         el.brollDock.classList.remove("on");
         showPortrait(true);
         setAISpeak(true);
         startLipSync();
       }else{
-        // non-AI: broll on, portrait off
         showPortrait(false);
         setAISpeak(false);
-        showBroll(true, scene.still || "idle");
+        showBroll(true,scene.still||"idle");
       }
-
-      startTyping(scene.text || "", 16, ()=>{
-        buildChoices(scene);
-        showInput(scene);
-
-        if(aiLine){
-          stopLipSync();
-          setTimeout(()=> setAISpeak(false), 420);
-        }
+      startTyping(scene.text||"",16,()=>{
+        buildChoices(scene); showInput(scene);
+        if(aiLine){ stopLipSync(); setTimeout(()=>setAISpeak(false),420); }
       });
     }
 
     function choose(ch){
       audio.ensure();
-
-      if(state.typing.active){
-        skipTyping();
-        return;
-      }
-
-      audio.sfx("tap");
-      haptic(10);
-
-      const from = state.sceneId;
-      const delta = ch.emotion || 0;
-
-      pushLog({
-        type:"choice",
-        sceneId: from,
-        choice: ch.text,
-        emotionDelta: delta
-      });
-
-      state.emotion = clamp(state.emotion + delta, 0, 100);
-      state.sceneId = ch.next;
-
-      if(from === -1) state.tempScene = null;
-
-      renderLog();
-      render();
+      if(state.typing.active){ skipTyping(); return; }
+      audio.sfx("tap"); haptic(10);
+      const from=state.sceneId;
+      pushLog({type:"choice",sceneId:from,choice:ch.text,emotionDelta:ch.emotion||0});
+      state.emotion=clamp(state.emotion+(ch.emotion||0),0,100);
+      state.sceneId=ch.next;
+      if(from===-1) state.tempScene=null;
+      renderLog(); render();
     }
 
     function resetGame(){
-      stopTyping();
-      stopLipSync();
-
-      state.sceneId = 0;
-      state.emotion = 0;
-      state.tempScene = null;
-      state.threat = { risk: 0, affect: "—", consistency: 100 };
-
+      stopTyping(); stopLipSync();
+      state.sceneId=0; state.emotion=0; state.tempScene=null;
+      state.threat={risk:0,affect:"—",consistency:100};
       applyThreatUI();
-
-      pushLog({ type:"system", msg:"처음부터 다시 시작" });
-      renderLog();
-      audio.sfx("confirm"); haptic(14);
-      render();
+      pushLog({type:"system",msg:"처음부터 다시 시작"}); renderLog();
+      audio.sfx("confirm"); haptic(14); render();
     }
 
-    // ---------- modal ----------
-    function openModal(){
-      el.modalBack.style.display = "block";
-      syncOptionsUI();
-      updateSlotMeta();
-      renderLog();
-      audio.ensure();
-      audio.sfx("tap");
-    }
-    function closeModal(){
-      el.modalBack.style.display = "none";
-      autosave();
-      audio.sfx("tap");
-    }
+    function openModal(){ el.modalBack.style.display="block"; syncOptionsUI(); updateSlotMeta(); renderLog(); audio.ensure(); audio.sfx("tap"); }
+    function closeModal(){ el.modalBack.style.display="none"; autosave(); audio.sfx("tap"); }
     function syncOptionsUI(){
-      el.optSound.checked = !!state.options.sound;
-      el.optHaptic.checked = !!state.options.haptic;
-      el.optAiAlways.checked = !!state.options.aiAlways;
-      audio.setEnabled(state.options.sound);
-      applyEmotionUI();
-      applyThreatUI();
+      el.optSound.checked=!!state.options.sound; el.optHaptic.checked=!!state.options.haptic; el.optAiAlways.checked=!!state.options.aiAlways;
+      audio.setEnabled(state.options.sound); applyEmotionUI(); applyThreatUI();
     }
 
-    el.btnSettings.onclick = openModal;
-    el.btnClose.onclick = closeModal;
-    el.modalBack.addEventListener("click", (e)=>{ if(e.target === el.modalBack) closeModal(); });
+    el.btnSettings.onclick=openModal; el.btnClose.onclick=closeModal;
+    el.modalBack.addEventListener("click",(e)=>{ if(e.target===el.modalBack) closeModal(); });
+    el.optSound.onchange=()=>{ state.options.sound=el.optSound.checked; audio.setEnabled(state.options.sound); autosave(); };
+    el.optHaptic.onchange=()=>{ state.options.haptic=el.optHaptic.checked; autosave(); };
+    el.optAiAlways.onchange=()=>{ state.options.aiAlways=el.optAiAlways.checked; applyEmotionUI(); autosave(); };
+    el.save1.onclick=()=>saveSlot(1); el.save2.onclick=()=>saveSlot(2); el.save3.onclick=()=>saveSlot(3);
+    el.load1.onclick=()=>loadSlot(1); el.load2.onclick=()=>loadSlot(2); el.load3.onclick=()=>loadSlot(3);
+    el.btnToggleLog.onclick=()=>{ el.logBox.classList.toggle("on"); audio.sfx("tap"); haptic(8); };
+    el.btnClearLog.onclick=()=>{ state.log=[]; pushLog({type:"system",msg:"로그 삭제됨"}); renderLog(); autosave(); audio.sfx("confirm"); haptic(12); };
+    el.btnReset.onclick=()=>{ closeModal(); resetGame(); };
 
-    el.optSound.onchange = ()=>{
-      state.options.sound = el.optSound.checked;
-      audio.setEnabled(state.options.sound);
-      autosave();
-    };
-    el.optHaptic.onchange = ()=>{ state.options.haptic = el.optHaptic.checked; autosave(); };
-    el.optAiAlways.onchange = ()=>{ state.options.aiAlways = el.optAiAlways.checked; applyEmotionUI(); autosave(); };
-
-    el.save1.onclick = ()=> saveSlot(1);
-    el.save2.onclick = ()=> saveSlot(2);
-    el.save3.onclick = ()=> saveSlot(3);
-    el.load1.onclick = ()=> loadSlot(1);
-    el.load2.onclick = ()=> loadSlot(2);
-    el.load3.onclick = ()=> loadSlot(3);
-
-    el.btnToggleLog.onclick = ()=>{
-      el.logBox.classList.toggle("on");
-      audio.sfx("tap"); haptic(8);
-    };
-    el.btnClearLog.onclick = ()=>{
-      state.log = [];
-      pushLog({ type:"system", msg:"로그 삭제됨" });
-      renderLog();
-      autosave();
-      audio.sfx("confirm"); haptic(12);
-    };
-
-    el.btnReset.onclick = ()=>{ closeModal(); resetGame(); };
-
-    // ---------- boot ----------
-    autoload();
-    syncOptionsUI();
-    updateSlotMeta();
-    renderLog();
-    render();
+    autoload(); syncOptionsUI(); updateSlotMeta(); renderLog(); render();
   </script>
 </body>
 </html>
